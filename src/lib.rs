@@ -280,13 +280,21 @@ impl State {
         let vertex_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),
-                contents: bytemuck::cast_slice(VERTICES_TRIANGLE),
+                contents: bytemuck::cast_slice(VERTICES_CANVAS),
                 usage: wgpu::BufferUsages::VERTEX,
             }
         );
 
-        let num_vertices = VERTICES_TRIANGLE.len() as u32;
-        let num_indices = 0;
+        let index_buffer = Some(device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Index Buffer"),
+                contents: bytemuck::cast_slice(INDICES_CANVAS),
+                usage: wgpu::BufferUsages::INDEX,
+            }
+        ));
+
+        let num_indices = INDICES_CANVAS.len() as u32;
+        let num_vertices = VERTICES_CANVAS.len() as u32;
 
         let bg_color = wgpu::Color {
             r: 0.7,
@@ -307,7 +315,7 @@ impl State {
             render_pipeline,
             vertex_buffer,
             num_vertices,
-            index_buffer: None,
+            index_buffer,
             num_indices,
             diffuse_bind_group,
             diffuse_texture,
@@ -372,16 +380,22 @@ impl State {
             self.vertex_buffer = self.device.create_buffer_init(
                 &wgpu::util::BufferInitDescriptor {
                     label: Some("Vertex Buffer"),
-                    contents: bytemuck::cast_slice(VERTICES_TRIANGLE),
+                    contents: bytemuck::cast_slice(VERTICES_CANVAS),
                     usage: wgpu::BufferUsages::VERTEX,
                 }
             );
 
-            self.num_vertices = VERTICES_TRIANGLE.len() as u32;
+            self.num_vertices = VERTICES_CANVAS.len() as u32;
 
-            self.index_buffer = None;
+            self.index_buffer = Some(self.device.create_buffer_init(
+                &wgpu::util::BufferInitDescriptor {
+                    label: Some("Index Buffer"),
+                    contents: bytemuck::cast_slice(INDICES_CANVAS),
+                    usage: wgpu::BufferUsages::INDEX,
+                }
+            ));
 
-            self.num_indices = 0;
+            self.num_indices = INDICES_CANVAS.len() as u32;
         }
     }
 
@@ -435,10 +449,11 @@ const VERTICES_PENTAGON: &[Vertex] = &[
 
 
 
-const VERTICES_TRIANGLE: &[Vertex] = &[
-    Vertex { position: [0.0, 0.5, 0.0],   color: [1.0, 0.0, 0.0], uv: [0.0,  1.0 ], },
-    Vertex { position: [-0.5, -0.5, 0.0], color: [0.0, 1.0, 0.0], uv: [0.0,  0.0], },
-    Vertex { position: [0.5, -0.5, 0.0],  color: [0.0, 0.0, 1.0], uv: [1.0,  0.0], },
+const VERTICES_CANVAS: &[Vertex] = &[
+    Vertex { position: [-1.0,-1.0, 0.0], color: [1.0, 0.0, 0.0], uv: [0.0,  0.0], },
+    Vertex { position: [ 1.0,-1.0, 0.0], color: [0.0, 1.0, 0.0], uv: [1.0,  0.0], },
+    Vertex { position: [-1.0, 1.0, 0.0], color: [0.0, 0.0, 1.0], uv: [0.0,  1.0], },
+    Vertex { position: [ 1.0, 1.0, 0.0], color: [1.0, 1.0, 1.0], uv: [1.0,  1.0], },
 ];
 
 const INDICES_PENTAGON: &[u16] = &[
@@ -447,7 +462,10 @@ const INDICES_PENTAGON: &[u16] = &[
     2, 3, 4,
 ];
 
-
+const INDICES_CANVAS: &[u16] = &[
+    0, 1, 2,
+    2, 1, 3,
+];
 
 #[repr(C)]
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
