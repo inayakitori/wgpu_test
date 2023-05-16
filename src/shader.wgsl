@@ -42,7 +42,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
         z = cmul(z,z) + c;
         //if outside disk |z| = 2 will definitely diverge
         if(z.x * z.x + z.y * z.y > 4.) {
-            return col * 0.5 + 0.5 * (f32(i) / f32(num_iter));
+            return col * 0.5 + 0.5 * (log2(f32(i)+1.) / log2(f32(num_iter)+1.));
         }
     }
     return vec4<f32>(z, 0., 0.);
